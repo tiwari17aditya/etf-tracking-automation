@@ -7,17 +7,29 @@ Zero API keys required. 100% free and open-source.
 
 from typing import Any, Dict, List, Optional
 import json
-import duckdb
+try:
+    import duckdb
+    db_conn = duckdb.connect(database=":memory:")
+except Exception:
+    duckdb = None
+    db_conn = None
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
-from mcp.server.mcpserver import MCPServer
 
-# Initialize MCP Server
-app = MCPServer("stock-research-mcp")
-
-# In-memory DuckDB connection for analytical queries
-db_conn = duckdb.connect(database=":memory:")
+try:
+    from mcp.server.mcpserver import MCPServer
+    app = MCPServer("stock-research-mcp")
+except Exception:
+    class DummyMCPServer:
+        def tool(self):
+            def decorator(f):
+                return f
+            return decorator
+        def run(self, *args, **kwargs):
+            pass
+    app = DummyMCPServer()
 
 
 def _normalize_symbol(symbol: str) -> str:
@@ -284,6 +296,8 @@ def query_duckdb(sql_query: str) -> List[Dict[str, Any]]:
     and running queries on local CSV/Parquet files.
     """
     try:
+        if db_conn is None:
+            return [{"error": "DuckDB is not available in serverless environment", "query": sql_query}]
         rel = db_conn.execute(sql_query)
         columns = [desc[0] for desc in rel.description]
         rows = rel.fetchall()

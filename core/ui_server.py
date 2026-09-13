@@ -661,10 +661,10 @@ async def api_reviewed_entities(request):
 
 # Main Web Page
 async def index_page(request):
-    index_file = WEB_DIR / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
-    return HTMLResponse("<h1>Stock Station Web UI</h1><p>Web frontend initializing...</p>")
+    for candidate in [WEB_DIR / "index.html", BASE_DIR / "public" / "index.html"]:
+        if candidate.exists():
+            return FileResponse(str(candidate))
+    return JSONResponse({"status": "live", "message": "Stock & ETF Quant Station API Active"})
 
 
 routes = [
@@ -679,8 +679,13 @@ routes = [
     Route("/api/study/tree", api_study_tree),
     Route("/api/study/content", api_study_content),
     Route("/api/chat", api_chat, methods=["POST"]),
-    Mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static"),
 ]
+
+# Only mount StaticFiles if directory exists on filesystem (prevents crash in serverless)
+if WEB_DIR.exists():
+    routes.append(Mount("/static", StaticFiles(directory=str(WEB_DIR)), name="static"))
+elif (BASE_DIR / "public").exists():
+    routes.append(Mount("/static", StaticFiles(directory=str(BASE_DIR / "public")), name="static"))
 
 middleware = [
     Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])

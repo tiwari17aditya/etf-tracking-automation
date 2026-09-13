@@ -1,0 +1,14 @@
+{
+  "$schema": "https://antigravity.google/schemas/plugin.json",
+  "name": "stock-analyst-suite",
+  "version": "1.0.0",
+  "displayName": "Stock Research, Study & Quant Analysis Suite",
+  "description": "Zero-cost MCP toolset for live stock quotes, OHLCV candles, technical indicators (RSI, EMA, ATR, Bollinger), fundamental statement audit, and local DuckDB quant queries.",
+  "author": "tiwari17aditya",
+  "skills": [
+    "../../skills/stock-research"
+  ],
+  "rules": [
+    "../../rules/stock_analysis_rules.md"
+  ]
+}

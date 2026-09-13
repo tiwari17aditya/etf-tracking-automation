@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "stock-analyst": {
+      "command": "d:\\Antigravity-Projects\\etf-tracking-automation\\.venv\\Scripts\\python.exe",
+      "args": [
+        "d:\\Antigravity-Projects\\etf-tracking-automation\\core\\mcp_servers\\stock_mcp_server.py"
+      ]
+    }
+  }
+}

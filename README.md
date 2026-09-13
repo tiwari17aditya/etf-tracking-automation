@@ -1,127 +1,90 @@
-# Smart Dip Accumulator & Dashboard (Vercel Architecture)
+# Stock Market Research, Study & Quant Station
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiwari17aditya%2Fetf-tracking-automation&project-name=etf-tracking-automation&env=CRON_SECRET,ALERT_RECIPIENT_EMAIL,RESEND_API_KEY)
+> An institutional-grade, zero-cost financial intelligence, research vault, and educational station powered by **Google Antigravity**, **FastMCP**, and **Starlette ASGI**.
 
-An end-to-end, highly accurate quantitative monitoring system for **Gold & Silver ETFs (`GOLDBEES.NS` & `SILVERBEES.NS`)**, featuring a Next.js web dashboard, an integrated AI Quant Co-Pilot chatbot, Vercel Serverless Cron automation, and an automated SMTP / Resend email alerting system. The system enforces a **>99% mathematical accuracy mandate** with a **Human-In-The-Loop (HITL)** capital protection mechanism.
-
----
-
-## 🏛️ System Architecture
-
-```mermaid
-graph TD
-    A[Vercel Cron '0 4-10 * * 1-5'] -->|Bearer CRON_SECRET| B[/api/cron-runner]
-    B -->|Layer 1: Tenacity Backoff| C[api/quant.py: yfinance + pandas]
-    C -->|RSI-14 & 50-EMA Calculation| D{Dip Condition Met?}
-    D -->|No| E[Log Telemetry / No-Op]
-    D -->|Yes: RSI < 35| F[Log Signal: PENDING_APPROVAL]
-    F -->|Await Promise / Resend API| G[Email Alert with One-Click HITL Link]
-    F --> H[HITL Action Center Dashboard]
-    H -->|User Approves ₹7,400| I[Execute & Deduct Sweep-In Balance]
-    H -->|User Rejects| J[Archive Proposal with Audit Note]
-    K[AI Quant Co-Pilot] -->|Deterministic Tools| L[Exact DB Telemetry - Zero Hallucination]
-```
+[![Technology Stack](https://img.shields.io/badge/Tech%20Stack-Documented-00d084.svg)](TECH_STACK.md)
+[![Zero Cost](https://img.shields.io/badge/Infrastructure-Zero%20Cost%20($0.00)-blue.svg)](TECH_STACK.md#hardware--operational-requirements)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](requirements.txt)
+[![UI Station](https://img.shields.io/badge/Web%20UI-Active%20(Port%208000)-green.svg)](http://localhost:8000)
 
 ---
 
-## 🚀 Environment Variables for Deployment
+## 🏛️ System Architecture & Quick Links
 
-When deploying to **Vercel**, set the following in **Project Settings > Environment Variables**:
+- 📋 **Full Technical Matrix**: Read [`TECH_STACK.md`](TECH_STACK.md) for a comprehensive tabular breakdown of all 8 system layers.
+- 🔬 **The 4 Indestructible Survival Pillars**: Read [`research/case_studies/`](research/case_studies/) covering Monetary Wealth, Pharma/Healthcare, FMCG Food Staples, and Power/Utilities.
+- 🗄️ **Reviewed Entities Vault**: View [`research/reviewed_entities/`](research/reviewed_entities/) for audited assets like [GOLDBEES.md](research/reviewed_entities/GOLDBEES.md) with 10-point scorecard.
+- 📚 **Quant Academy Courseware**: Explore [`study/`](study/) for progressive 9-module curriculum from beginner to advanced.
+- 📓 **Session Audit Logs**: Review daily prompt tracking in [`session_logs/`](session_logs/).
+- 🌐 **Comprehensive MCP Guide**: Explore [`others/mcp_servers_comprehensive_guide.md`](others/mcp_servers_comprehensive_guide.md) for a global census of ~1,250 servers and monetization blueprints.
 
-| Variable | Description | Example / Default |
+---
+
+## ⚡ Available Slash Commands & Skills
+
+Custom agent workflows configured in [`.agents/skills/`](.agents/skills/):
+
+| Command / Skill | Trigger | Purpose & Execution |
+|---|---|---|
+| **`/packup`** | `/packup for today` | Automatically runs the 10-point audit refresh, tests API health, commits session logs (JSONL + Markdown), and delivers an executive wrap-up summary. |
+| **`/audit <ticker>`** | `/audit GOLDBEES.NS` | Performs a 10-factor quantitative scorecard audit, assigns PASS/ACCEPTABLE/FAIL ratings with empirical explanations, and generates a dossier. |
+| **`/study <module>`** | `/study technicals` | Activates the interactive Quant Tutor navigating modules in `study/` paired with live market calculations. |
+| **`/refresh-vault`** | `/refresh-vault` | Runs `scripts/update_reviewed_entities.py` to refresh all live indicators and prices across reviewed dossiers. |
+
+---
+
+## 🚀 Free MCP Tools Ecosystem
+
+The custom `stock-analyst` FastMCP server exposes 5 zero-cost financial tools:
+
+| Tool Name | Parameters | Description |
 | :--- | :--- | :--- |
-| `CRON_SECRET` | **Required.** Authorization secret for Vercel Cron. | `smart_dip_cron_secure_secret_2026` |
-| `NEXT_PUBLIC_APP_URL` | **Required.** Your production Vercel URL. | `https://your-app.vercel.app` |
-| `ALERT_RECIPIENT_EMAIL` | **Required.** Email address to receive accumulation alerts. | `your-email@example.com` |
-| `RESEND_API_KEY` | **Recommended.** HTTP Email API key (resend.com) to bypass serverless TCP drops. | `re_123456789...` |
-| `SMTP_HOST` | *(Optional if not using Resend)* SMTP server host. | `smtp.gmail.com` |
-| `SMTP_PORT` | *(Optional if not using Resend)* SMTP server port. | `587` |
-| `SMTP_USER` | *(Optional if not using Resend)* SMTP username. | `user@gmail.com` |
-| `SMTP_PASS` | *(Optional if not using Resend)* SMTP app password. | `app-password-here` |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | *(Optional)* Google Gemini API key for AI Chatbot. Built-in deterministic engine works without it! | `AIzaSy...` |
-| `DATABASE_URL` | Database connection string. SQLite is default for zero-setup local dev; Supabase or Vercel Postgres for cloud. | `file:./dev.db` |
+| `get_stock_quote` | `symbol: str` | Live/latest price, day high/low, 52W range, P/E, volume for US & Indian tickers (e.g., `GOLDBEES.NS`, `NVDA`, `TCS.NS`). |
+| `get_historical_candles` | `symbol, period, interval` | Multi-timeframe OHLCV bars (`1m`, `5m`, `1d`, `1wk`, `1mo`). |
+| `calculate_indicators` | `symbol, period` | 14-period Wilder RSI, 20/50/200 EMAs, 14-period ATR, and Bollinger Bands with Bandwidth and %B. |
+| `get_financial_statements` | `symbol, statement_type` | Pulls trailing 4 quarters/years for `income`, `balance_sheet`, or `cashflow`. |
+| `query_duckdb` | `sql_query: str` | Executes analytical SQL in DuckDB memory for backtesting or statistical calculations. |
 
 ---
 
-## 🛠️ Local Development
+## 📂 Minimal Directory Hierarchy
 
-### 1. Python Virtual Environment (`.venv`)
-```bash
-# Create virtual environment
-python -m venv .venv
+The project strictly adheres to a clean, 9-directory structure:
 
-# Install quantitative requirements
-.\.venv\Scripts\pip.exe install -r requirements.txt
+```
+etf-tracking-automation/
+├── .agents/                          # Antigravity IDE plugins, rules & skills
+├── api/                              # Cloud Serverless ASGI gateway (Vercel)
+├── core/                             # Backend server & FastMCP tools
+├── research/                         # Case studies & reviewed entity dossiers
+├── scripts/                          # Maintenance & recalculation runners
+├── session_logs/                     # Daily prompt & milestone logs (JSONL + MD)
+├── study/                            # 9-module financial academy courseware
+├── web/                              # Zero-dependency reactive frontend
+├── others/                           # Comprehensive MCP census & guides
+├── deploy_vercel.bat                 # 1-Click cloud deployment script
+├── start_ui.bat                      # 1-Click local station launcher
+├── requirements.txt                  # Python dependencies manifest
+├── vercel.json                       # Cloud serverless configuration
+├── README.md                         # Project documentation
+└── TECH_STACK.md                     # Tabular technology architecture matrix
 ```
 
-### 2. Node.js Next.js Server
-```bash
-# Install npm dependencies
-npm install
+---
 
-# Run development server
-npm run dev
+## 💻 Running Locally & Cloud Deployment
+
+### Local Station
+Launch the interactive web station at `http://localhost:8000`:
+```bash
+# Double click start_ui.bat or run:
+.\start_ui.bat
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to view the live dashboard.
-
----
-
-## 📦 Deployment to Vercel via Git
-
-1. **Initialize and Commit to Git**:
+### Vercel Serverless Deployment (Option 1)
+Deploy to Vercel in seconds using the local CLI runner:
 ```bash
-git add .
-git commit -m "feat: Smart Dip Accumulator with HITL, Vercel Cron, and AI Co-Pilot"
+# Double click deploy_vercel.bat or run:
+.\deploy_vercel.bat
 ```
-
-2. **Connect your GitHub Remote Repository**:
-```bash
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
-git branch -M main
-git push -u origin main
-```
-
-3. **Import into Vercel**:
-- Go to [vercel.com/new](https://vercel.com/new) and import your GitHub repository.
-- Under **Environment Variables**, paste the variables listed in the table above.
-- Click **Deploy**.
-- Vercel will automatically detect `vercel.json` and activate the Cron Job for Indian market hours (`0 4-10 * * 1-5`).
-
----
-
-## 🛡️ Anti-Crash Mandate (3 Layers)
-
-1. **Layer 1 (Ingestion)**: Exponential retries with `tenacity` against NSE/Yahoo Finance throttling; exits cleanly with `204` or `502` to prevent database corruption.
-2. **Layer 2 (Frontend UI)**: React Error Boundary ([`app/error.tsx`](./app/error.tsx)) with cached fallback feed ensuring zero blank white screens.
-3. **Layer 3 (Chatbot Guardrails)**: Deterministic RAG tool-calling with zero price hallucination and verified hardcoded fallback prompts.
-
----
-
-## 📊 Formatted Tabular Logs & Session Analytics
-
-The web dashboard features a dedicated **Telemetry Logs & Chat Token Analytics** panel with two formatted tabular views:
-- **Application Event Logs**: Chronological table of system events, quant calculations, cron triggers, and HITL state transitions with severity badges (`SUCCESS`, `INFO`, `WARN`, `ERROR`), category tags, diagnostic details, and response latency.
-- **Chat Session & Token Tracker**: Real-time KPI cards and table tracking **Input (Prompt) Tokens**, **Output (Completion) Tokens**, **Total Tokens**, and execution latency (ms) for every AI co-pilot interaction.
-
----
-
-## 🧹 Vercel-Only Automated Purge Schedule
-
-To prevent serverless storage bloat while avoiding noisy GitHub Action cron runners, log purging is scheduled **exclusively on Vercel**:
-- **Endpoint**: [`/api/purge`](./app/api/purge/route.ts)
-- **Vercel Schedule**: `0 18 * * 0` (Every Sunday at 18:00 UTC / 11:30 PM IST before the trading week begins).
-- **Retention**: Cleans application logs, cron telemetry, and chat sessions older than 14 days, and auto-expires stale pending dip signals older than 7 days.
-- **Security**: Protected by the same `CRON_SECRET` bearer authorization gate.
-
----
-
-## ⚡ Custom Skills & `/packup` Routine
-
-This repository includes project-specialized skills under [`.agents/skills/`](./.agents/skills/):
-- **`smart-dip-quant`**: Quantitative mathematical calculations, Wilder's RSI, and 50-EMA procedures.
-- **`smart-dip-hitl-workflow`**: Human-In-The-Loop order execution, approval links, and audit trail rules.
-- **`vercel-serverless-deploy`**: Vercel Serverless continuous deployment runbooks.
-- **`smart-dip-orchestrator`**: Master skill that coordinates all sub-skills and slash commands.
-- **`packup`**: Automated session packup routine that validates builds, updates documentation, stages and pushes changes to GitHub, and concludes with an inspiring motivational proverb.
-
+*(Requires `npx vercel` installed or runs directly with one-time browser login).*

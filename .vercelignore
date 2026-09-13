@@ -1,0 +1,14 @@
+.venv/
+venv/
+ENV/
+.git/
+.github/
+.agents/
+others/
+session_logs/
+scratch/
+__pycache__/
+*.py[cod]
+*.pyc
+.DS_Store
+*.bat

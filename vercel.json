@@ -1,46 +1,17 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "crons": [
-    {
-      "path": "/api/cron-runner",
-      "schedule": "0 4-10 * * 1-5"
-    },
-    {
-      "path": "/api/purge",
-      "schedule": "0 18 * * 0"
-    }
-  ],
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 60,
-      "memory": 1024
-    },
-    "api/quant.py": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
-  "headers": [
+  "version": 2,
+  "rewrites": [
     {
       "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
-      ]
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/static/(.*)",
+      "destination": "/web/$1"
     },
     {
       "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-      ]
+      "destination": "/web/index.html"
     }
   ]
 }

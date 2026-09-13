@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock & ETF Quant Research Station</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-theme">
+  <div class="app-layout">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand-zone">
+        <div class="brand-icon">📈</div>
+        <div class="brand-text">
+          <h1>Stock & Quant Station</h1>
+          <span class="brand-subtitle">Powered by Antigravity MCP</span>
+        </div>
+      </div>
+
+      <!-- Quick Ticker Input -->
+      <div class="nav-search-wrap">
+        <input type="text" id="global-ticker-input" placeholder="Enter Ticker (e.g. GOLDBEES, NVDA, TCS)..." value="GOLDBEES">
+        <button id="search-ticker-btn" class="btn btn-primary">Analyze</button>
+        <button id="nav-graph-analysis-btn" class="btn btn-graph-nav" title="Inspect price in Rupees vs Time chart">📈 Graph Analysis</button>
+      </div>
+
+      <!-- Tab Buttons -->
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="tab-chat">
+          <span class="tab-icon">💬</span>
+          <span class="tab-label">AI Co-Pilot</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-watchlist">
+          <span class="tab-icon">📋</span>
+          <span class="tab-label">Reviewed Vault</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-terminal">
+          <span class="tab-icon">📊</span>
+          <span class="tab-label">Live Terminal</span>
+        </button>
+        <button class="tab-btn" data-tab="tab-academy">
+          <span class="tab-icon">🎓</span>
+          <span class="tab-label">Study Academy</span>
+        </button>
+      </nav>
+
+      <!-- Status Indicator -->
+      <div class="system-status">
+        <span class="status-dot green"></span>
+        <span class="status-text">MCP Live</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-viewport">
+
+      <!-- TAB 1: AI CO-PILOT CHATBOT -->
+      <section id="tab-chat" class="tab-content active">
+        <div class="chat-container">
+          
+          <div class="chat-header">
+            <div class="chat-title">
+              <h2>🤖 Quant & Financial Study Co-Pilot</h2>
+              <p>Ask anything about stock valuation, technical indicators, or study modules. Powered by real deterministic MCP data.</p>
+            </div>
+            <div class="quick-prompts-bar">
+              <span class="quick-label">Suggestions:</span>
+              <button class="prompt-chip" data-prompt="Audit GOLDBEES.NS: Is it in an oversold dip zone?">Audit GOLDBEES</button>
+              <button class="prompt-chip" data-prompt="Audit NVDA: current price, 52W range, RSI and 50 EMA">Audit NVDA</button>
+              <button class="prompt-chip" data-prompt="Explain Wilder's RSI-14 formula and why 35 is oversold">Explain Wilder RSI</button>
+              <button class="prompt-chip" data-prompt="Explain ROCE vs ROE and the leverage trap">ROCE vs ROE Trap</button>
+              <button class="prompt-chip" data-prompt="Explain Options Greeks: Delta, Theta, Gamma, Vega">Options Greeks</button>
+            </div>
+          </div>
+
+          <!-- Chat Scrollable Messages -->
+          <div class="chat-messages" id="chat-messages-container">
+            <div class="message-card assistant">
+              <div class="avatar">📈</div>
+              <div class="message-body">
+                <h3>Welcome to your Stock & Quant Research Station!</h3>
+                <p>I am your AI Co-Pilot connected directly to our local <strong>zero-cost MCP server</strong> and the <strong>3-tier study curriculum</strong>.</p>
+                <p>Click any prompt chip above or type any query below to audit a stock, compute Wilder's RSI, or walk through balance sheets!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <div class="chat-input-wrapper">
+            <form id="chat-form">
+              <input type="text" id="chat-input" placeholder="Ask about any stock, technical setup, or study concept..." autocomplete="off">
+              <button type="submit" class="btn btn-send" id="chat-send-btn">
+                <span>Send</span>
+                <span class="send-icon">➤</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: LIVE TERMINAL & ETF SCREENER -->
+      <section id="tab-terminal" class="tab-content">
+        <div class="terminal-container">
+          
+          <!-- Header Metric Cards -->
+          <div class="terminal-grid-top">
+            <div class="metric-card hero-card">
+              <div class="metric-header">
+                <span class="symbol-badge" id="card-symbol">GOLDBEES.NS</span>
+                <span class="company-name" id="card-name">Nippon India ETF Gold BeES</span>
+              </div>
+              <div class="price-display">
+                <span class="current-price" id="card-price">₹125.12</span>
+                <span class="price-change positive" id="card-change">+0.00%</span>
+              </div>
+              <div class="metric-footer">
+                <span>Prev Close: <strong id="card-prev-close">₹126.27</strong></span>
+                <span>Currency: <strong id="card-currency">INR</strong></span>
+              </div>
+              <div class="hero-card-actions">
+                <button id="terminal-graph-btn" class="btn btn-graph-hero" title="Open Interactive ₹ Rupees vs Time Graph Analysis">
+                  <span>📈 Graph Analysis</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="card-title">52-Week Range</div>
+              <div class="range-bar-wrap">
+                <div class="range-labels">
+                  <span id="card-low-52">₹88.50</span>
+                  <span id="card-high-52">₹130.00</span>
+                </div>
+                <div class="range-track">
+                  <div class="range-fill" id="card-52w-progress" style="width: 85%;"></div>
+                </div>
+              </div>
+              <div class="range-stats">
+                <div>Day High: <strong id="card-day-high">₹125.80</strong></div>
+                <div>Day Low: <strong id="card-day-low">₹124.50</strong></div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="card-title">Valuation & Liquidity</div>
+              <div class="stat-grid">
+                <div>Trailing P/E: <strong id="card-pe">N/A</strong></div>
+                <div>Price / Book: <strong id="card-pb">N/A</strong></div>
+                <div>Div Yield: <strong id="card-yield">0.0%</strong></div>
+                <div>Market Cap: <strong id="card-mcap">N/A</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Middle Row: Technical Indicators & Gauges -->
+          <div class="terminal-grid-mid">
+            
+            <!-- RSI Gauge Card -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>⚡ Wilder's RSI (14-Period)</h3>
+                <span class="badge" id="rsi-status-badge">Neutral</span>
+              </div>
+              <div class="rsi-gauge-box">
+                <div class="rsi-value-big" id="rsi-number">48.93</div>
+                <div class="rsi-scale-bar">
+                  <div class="rsi-pointer" id="rsi-needle" style="left: 48.93%;"></div>
+                </div>
+                <div class="rsi-zones">
+                  <span class="zone-tag green">Oversold (&le;35)</span>
+                  <span class="zone-tag gray">Neutral (36-69)</span>
+                  <span class="zone-tag red">Overbought (&ge;70)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Moving Average Alignment Card -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>📐 Trend Moving Averages (EMA)</h3>
+              </div>
+              <div class="ema-list">
+                <div class="ema-item">
+                  <span>20 EMA (Tactical)</span>
+                  <strong id="ema-20-val">₹126.23</strong>
+                </div>
+                <div class="ema-item">
+                  <span>50 EMA (Accumulation)</span>
+                  <strong id="ema-50-val">₹124.80</strong>
+                </div>
+                <div class="ema-item">
+                  <span>200 EMA (Structural)</span>
+                  <strong id="ema-200-val">₹118.50</strong>
+                </div>
+                <div class="ema-item highlight">
+                  <span>Trend Status</span>
+                  <strong id="ema-trend-val">ABOVE 50 EMA 🟢</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bollinger Bands & ATR -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>🌊 Volatility & Bollinger Bands</h3>
+              </div>
+              <div class="bb-stats-list">
+                <div class="bb-item">
+                  <span>Upper Band (2σ)</span>
+                  <strong id="bb-upper">₹128.50</strong>
+                </div>
+                <div class="bb-item">
+                  <span>Middle SMA (20)</span>
+                  <strong id="bb-middle">₹125.00</strong>
+                </div>
+                <div class="bb-item">
+                  <span>Lower Band (2σ)</span>
+                  <strong id="bb-lower">₹121.50</strong>
+                </div>
+                <div class="bb-item">
+                  <span>14-Day ATR (Volatility)</span>
+                  <strong id="atr-14-val">₹1.45</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Row: Financial Statement Explorer -->
+          <div class="panel-card full-width">
+            <div class="panel-header flex-between">
+              <h3>📑 Corporate Financial Statement Explorer</h3>
+              <div class="statement-tabs">
+                <button class="st-tab-btn active" data-statement="income">Income (P&L)</button>
+                <button class="st-tab-btn" data-statement="balance_sheet">Balance Sheet</button>
+                <button class="st-tab-btn" data-statement="cashflow">Cash Flow</button>
+              </div>
+            </div>
+            <div class="table-scroll-container">
+              <table class="financial-table" id="financial-table">
+                <thead>
+                  <tr id="financial-table-head">
+                    <th>Line Item</th>
+                    <th>Period 1</th>
+                    <th>Period 2</th>
+                  </tr>
+                </thead>
+                <tbody id="financial-table-body">
+                  <tr><td colspan="3" class="text-center">Loading financial statements...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 3: STUDY ACADEMY -->
+      <section id="tab-academy" class="tab-content">
+        <div class="academy-layout">
+          
+          <!-- Left Navigation Menu of Chapters -->
+          <aside class="academy-sidebar">
+            <div class="sidebar-header">
+              <h3>📚 Curriculum Syllabus</h3>
+              <span class="level-count">3 Levels • 9 Chapters</span>
+            </div>
+            <div class="module-tree" id="academy-tree-container">
+              <!-- Rendered dynamically by app.js -->
+              <div class="tree-loading">Loading curriculum modules...</div>
+            </div>
+          </aside>
+
+          <!-- Right Reading Pane -->
+          <article class="academy-reader">
+            <div class="reader-toolbar">
+              <span class="current-chapter-title" id="reader-title">Select a chapter from the left</span>
+              <button class="btn btn-outline" id="ask-chapter-btn">
+                <span>💬 Ask Co-Pilot About This Chapter</span>
+              </button>
+            </div>
+            <div class="reader-body markdown-body" id="reader-content">
+              <p>Click any topic in the curriculum on the left to read institutional financial notes, formulas, and strategies.</p>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- TAB 4: REVIEWED ENTITIES VAULT -->
+      <section id="tab-watchlist" class="tab-content">
+        <div class="watchlist-container">
+          
+          <div class="watchlist-header">
+            <div class="watchlist-title-zone">
+              <h2>📋 Reviewed Entities Vault</h2>
+              <p>Exclusively listing investment entities officially audited in <code>research/reviewed_entities/</code>. Click any card to inspect the itemized PASS/FAIL scorecard and final Buy/Hold conclusion.</p>
+            </div>
+
+            <!-- Vault Controls -->
+            <div class="watchlist-controls">
+              <span class="vault-badge" id="vault-count-badge">1 Entity Audited</span>
+              <button id="watchlist-refresh-btn" class="btn btn-outline">🔄 Refresh Vault</button>
+            </div>
+          </div>
+
+          <!-- Quick Filter Chips -->
+          <div class="watchlist-preset-bar">
+            <span class="preset-label">Indestructible Categories:</span>
+            <button class="filter-chip active" data-filter="ALL">All Reviewed</button>
+            <button class="filter-chip" data-filter="Sovereign Monetary Wealth">🪙 Monetary Wealth</button>
+            <button class="filter-chip" data-filter="Healthcare & Pharma">🏥 Healthcare</button>
+            <button class="filter-chip" data-filter="Food & FMCG">🍞 Food & FMCG</button>
+            <button class="filter-chip" data-filter="Power & Utilities">⚡ Power & Utilities</button>
+          </div>
+
+          <!-- Reviewed Cards Grid -->
+          <div class="watchlist-grid" id="watchlist-grid-container">
+            <div class="watchlist-loading">Loading reviewed dossiers from disk...</div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- REVIEWED ENTITY AUDIT MODAL -->
+  <div id="audit-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-tag" id="modal-category">Sovereign Monetary Wealth</span>
+          <h2 id="modal-title">Nippon India ETF Gold BeES (GOLDBEES.NS)</h2>
+          <div class="modal-meta" id="modal-meta">Last Telemetry: 14-09-2026T01:26:13 IST</div>
+        </div>
+        <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- FINAL VERDICT HERO BANNER -->
+        <div class="verdict-banner" id="modal-verdict-banner">
+          <div class="verdict-left">
+            <span class="verdict-label">FINAL STRATEGIC VERDICT:</span>
+            <div class="verdict-action" id="modal-verdict-action">🟢 BUY - ACCUMULATE (TRANCHE 1 ACTIVE)</div>
+            <p class="verdict-rationale" id="modal-verdict-rationale">Loading rationale...</p>
+          </div>
+          <div class="verdict-score-box">
+            <span class="score-num" id="modal-score-num">9.0</span>
+            <span class="score-label">SCORE / 10</span>
+          </div>
+        </div>
+
+        <!-- LIVE METRICS BAR -->
+        <div class="modal-factor-strip" id="modal-factor-strip">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- ITEMIZED PASS / FAIL CHECKLIST -->
+        <div class="audit-checklist-section">
+          <div class="section-title-wrap">
+            <h3>🛡️ Due-Diligence Checklist (Itemized Pass / Fail Criteria)</h3>
+            <span class="check-subtitle">Every pillar verified against strict institutional thresholds</span>
+          </div>
+          <div class="checklist-table-wrap">
+            <table class="checklist-table">
+              <thead>
+                <tr>
+                  <th>Audit Dimension</th>
+                  <th>Institutional Benchmark</th>
+                  <th>Realized Metric</th>
+                  <th style="text-align: center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="modal-checks-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MULTI-TRANCHE CAPITAL ROADMAP -->
+        <div class="tranche-roadmap-section">
+          <h3>🎯 Multi-Tranche Capital Deployment Plan</h3>
+          <div class="tranche-grid" id="modal-tranche-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="modal-audit-copilot-btn">💬 Audit With Co-Pilot</button>
+        <button class="btn btn-primary" id="modal-done-btn">Close Inspection</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTERACTIVE GRAPH ANALYSIS MODAL (RUPEES VS TIME) -->
+  <div id="graph-modal" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-graph-dialog">
+      
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="graph-title-top">
+            <span class="symbol-badge" id="graph-modal-symbol">GOLDBEES.NS</span>
+            <span class="company-name" id="graph-modal-name">Nippon India ETF Gold BeES</span>
+            <span class="currency-tag">₹ INR Price Chart</span>
+          </div>
+          <div class="graph-live-strip">
+            <span class="graph-price" id="graph-modal-price">₹125.12</span>
+            <span class="graph-change positive" id="graph-modal-change">+0.00 (+0.00%)</span>
+            <span class="graph-timeframe-label" id="graph-modal-timeframe-label">1 Month</span>
+          </div>
+        </div>
+        <button id="graph-modal-close-btn" class="modal-close-btn" title="Close Graph">&times;</button>
+      </div>
+
+      <div class="modal-body graph-modal-body">
+        <!-- Timeframe Toolbar -->
+        <div class="graph-toolbar">
+          <div class="timeframe-pills" id="graph-timeframe-selector">
+            <button class="timeframe-btn" data-period="1d" title="1 Day Intraday (5m)">1D</button>
+            <button class="timeframe-btn" data-period="1w" title="Weekly (15m)">1W</button>
+            <button class="timeframe-btn active" data-period="1mo" title="1 Month (Daily)">1M</button>
+            <button class="timeframe-btn" data-period="1y" title="1 Year (Daily)">1Y</button>
+            <button class="timeframe-btn" data-period="3y" title="3 Years (Daily)">3Y</button>
+            <button class="timeframe-btn" data-period="5y" title="5 Years (Weekly)">5Y</button>
+          </div>
+          
+          <div class="chart-mode-pills">
+            <button class="mode-btn active" id="mode-area-btn" title="Smooth Area Gradient View">Area</button>
+            <button class="mode-btn" id="mode-line-btn" title="Crisp Trendline View">Line</button>
+          </div>
+        </div>
+
+        <!-- Metric Factor Strip -->
+        <div class="graph-factor-strip">
+          <div class="m-factor-box">
+            <span class="m-factor-label">Period Open</span>
+            <span class="m-factor-val" id="graph-open-val">₹0.00</span>
+          </div>
+          <div class="m-factor-box">
+            <span class="m-factor-label">Period High</span>
+            <span class="m-factor-val text-green" id="graph-high-val">₹0.00</span>
+          </div>
+          <div class="m-factor-box">
+            <span class="m-factor-label">Period Low</span>
+            <span class="m-factor-val text-red" id="graph-low-val">₹0.00</span>
+          </div>
+          <div class="m-factor-box">
+            <span class="m-factor-label">Net Return (₹)</span>
+            <span class="m-factor-val" id="graph-return-val">₹0.00</span>
+          </div>
+          <div class="m-factor-box">
+            <span class="m-factor-label">Candle Points</span>
+            <span class="m-factor-val" id="graph-count-val">0</span>
+          </div>
+        </div>
+
+        <!-- Canvas Chart Area -->
+        <div class="chart-canvas-container" id="chart-container">
+          <div class="chart-loading-overlay hidden" id="chart-loading-spinner">
+            <div class="spinner"></div>
+            <span>Fetching real-time candles...</span>
+          </div>
+          <canvas id="price-history-canvas"></canvas>
+          <div class="chart-hover-inspect" id="chart-hover-inspect">
+            <div class="inspect-time" id="inspect-time">--</div>
+            <div class="inspect-price" id="inspect-price">₹--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="graph-footer-hint">
+          <span>💡 Tip: Hover or drag along the chart to inspect prices in Rupees (₹) and timestamps.</span>
+        </div>
+        <button class="btn btn-outline" id="graph-ask-copilot-btn">💬 Ask Co-Pilot About Setup</button>
+        <button class="btn btn-primary" id="graph-modal-done-btn">Close Analysis</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 # Smart Dip Accumulator & Dashboard (Vercel Architecture)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiwari17aditya%2Fetf-tracking-automation&project-name=etf-tracking-automation&env=CRON_SECRET,ALERT_RECIPIENT_EMAIL,RESEND_API_KEY)
+
 An end-to-end, highly accurate quantitative monitoring system for **Gold & Silver ETFs (`GOLDBEES.NS` & `SILVERBEES.NS`)**, featuring a Next.js web dashboard, an integrated AI Quant Co-Pilot chatbot, Vercel Serverless Cron automation, and an automated SMTP / Resend email alerting system. The system enforces a **>99% mathematical accuracy mandate** with a **Human-In-The-Loop (HITL)** capital protection mechanism.
 
 ---

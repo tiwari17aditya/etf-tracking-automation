@@ -8,8 +8,19 @@ interface StoreData {
   settings: PortfolioSetting;
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const STORE_PATH = path.join(DATA_DIR, 'store.json');
+function getStoragePath(): { dir: string; file: string } {
+  // Check if running on Vercel / serverless (read-only root)
+  const localDataDir = path.join(process.cwd(), 'data');
+  const tmpDataDir = path.join('/tmp', 'smart_dip_data');
+
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return { dir: tmpDataDir, file: path.join(tmpDataDir, 'store.json') };
+  }
+
+  return { dir: localDataDir, file: path.join(localDataDir, 'store.json') };
+}
+
+let memoryStore: StoreData | null = null;
 
 const DEFAULT_SETTINGS: PortfolioSetting = {
   id: 'default',
@@ -143,39 +154,62 @@ const SEED_LOGS: CronRunLog[] = [
 ];
 
 function ensureStore(): StoreData {
+  if (memoryStore) {
+    return memoryStore;
+  }
+
+  const { dir, file } = getStoragePath();
+
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(/*turbopackIgnore: true*/ dir)) {
+      fs.mkdirSync(/*turbopackIgnore: true*/ dir, { recursive: true });
     }
-    if (!fs.existsSync(STORE_PATH)) {
-      const initial: StoreData = {
-        signals: SEED_SIGNALS,
-        cronLogs: SEED_LOGS,
-        settings: DEFAULT_SETTINGS,
-      };
-      fs.writeFileSync(STORE_PATH, JSON.stringify(initial, null, 2), 'utf-8');
+    if (!fs.existsSync(/*turbopackIgnore: true*/ file)) {
+      // Check if seed file exists in project data dir
+      const projectSeed = path.join(process.cwd(), 'data', 'store.json');
+      let initial: StoreData;
+      if (fs.existsSync(projectSeed)) {
+        initial = JSON.parse(fs.readFileSync(projectSeed, 'utf-8'));
+      } else {
+        initial = {
+          signals: SEED_SIGNALS,
+          cronLogs: SEED_LOGS,
+          settings: DEFAULT_SETTINGS,
+        };
+      }
+      try {
+        fs.writeFileSync(/*turbopackIgnore: true*/ file, JSON.stringify(initial, null, 2), 'utf-8');
+      } catch (writeErr) {
+        console.warn('Could not write to disk storage, using in-memory store:', writeErr);
+      }
+      memoryStore = initial;
       return initial;
     }
-    const raw = fs.readFileSync(STORE_PATH, 'utf-8');
-    return JSON.parse(raw) as StoreData;
+    const raw = fs.readFileSync(/*turbopackIgnore: true*/ file, 'utf-8');
+    memoryStore = JSON.parse(raw) as StoreData;
+    return memoryStore;
   } catch (error) {
-    console.error('Error ensuring data store:', error);
-    return {
+    console.error('Error reading data store, falling back to memory store:', error);
+    memoryStore = {
       signals: SEED_SIGNALS,
       cronLogs: SEED_LOGS,
       settings: DEFAULT_SETTINGS,
     };
+    return memoryStore;
   }
 }
 
 function saveStore(data: StoreData): void {
+  memoryStore = data;
+  const { dir, file } = getStoragePath();
+
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(/*turbopackIgnore: true*/ dir)) {
+      fs.mkdirSync(/*turbopackIgnore: true*/ dir, { recursive: true });
     }
-    fs.writeFileSync(STORE_PATH, JSON.stringify(data, null, 2), 'utf-8');
+    fs.writeFileSync(/*turbopackIgnore: true*/ file, JSON.stringify(data, null, 2), 'utf-8');
   } catch (error) {
-    console.error('Error saving data store:', error);
+    console.warn('Serverless storage write notice (persisting in memory):', error);
   }
 }
 

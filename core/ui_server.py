@@ -697,11 +697,21 @@ if WEB_DIR.exists():
 elif (BASE_DIR / "public").exists():
     routes.append(Mount("/static", StaticFiles(directory=str(BASE_DIR / "public")), name="static"))
 
-middleware = [
-    Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-]
+async def server_error_handler(request, exc):
+    import traceback
+    return JSONResponse({
+        "error": True,
+        "type": "UnhandledServerException",
+        "message": str(exc),
+        "traceback": traceback.format_exc()
+    }, status_code=200)
 
-app = Starlette(routes=routes, middleware=middleware)
+exception_handlers = {
+    500: server_error_handler,
+    Exception: server_error_handler
+}
+
+app = Starlette(routes=routes, middleware=middleware, exception_handlers=exception_handlers)
 
 
 def run_server(port: int = 8000):

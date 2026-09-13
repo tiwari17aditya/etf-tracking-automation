@@ -1,8 +1,0 @@
-[project]
-name = "stock-quant-station"
-version = "1.0.0"
-description = "Stock & ETF Quant Research Station"
-requires-python = ">=3.11"
-
-[tool.vercel]
-entrypoint = "api/index.py"

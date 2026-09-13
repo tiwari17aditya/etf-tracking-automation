@@ -54,13 +54,41 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast(`Network Notice: ${event.reason?.message || "Operation failed."}`, "warning");
   });
 
+  // Dynamic API Base URL (connects to local Python analysis engine when deployed on Vercel)
+  const isLocalHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  let apiBaseUrl = isLocalHost ? "" : (localStorage.getItem("quant_api_url") || "http://localhost:8000");
+
+  // System Status Indicator for Local Engine
+  const statusDot = document.querySelector(".status-dot");
+  const statusText = document.querySelector(".status-text");
+
+  async function checkEngineStatus() {
+    try {
+      const pingUrl = (apiBaseUrl ? `${apiBaseUrl}/api/quote` : `/api/quote`) + "?symbol=GOLDBEES.NS";
+      const controller = new AbortController();
+      const tId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(pingUrl, { signal: controller.signal });
+      clearTimeout(tId);
+      if (res.ok) {
+        if (statusDot) statusDot.className = "status-dot green";
+        if (statusText) statusText.textContent = isLocalHost ? "Local Engine: Live" : "Local Connected";
+      } else {
+        throw new Error("Bad response");
+      }
+    } catch {
+      if (statusDot) statusDot.className = "status-dot amber";
+      if (statusText) statusText.textContent = isLocalHost ? "Engine Offline" : "Connect Local:8000";
+    }
+  }
+
   // Safe Fetch Wrapper with timeout and error capture
-  async function safeFetch(url, options = {}, timeoutMs = 12000) {
+  async function safeFetch(url, options = {}, timeoutMs = 15000) {
+    const targetUrl = (url.startsWith("/api") && apiBaseUrl) ? `${apiBaseUrl}${url}` : url;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(targetUrl, {
         ...options,
         signal: controller.signal
       });
@@ -77,9 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === "AbortError") {
-        return { ok: false, error: "Request timed out. Please check server status." };
+        return { ok: false, error: "Request timed out. Please check that your local engine is running on http://localhost:8000." };
       }
-      return { ok: false, error: err.message || "Network connection error." };
+      return { ok: false, error: err.message || "Network connection error to local engine." };
     }
   }
 
@@ -1428,6 +1456,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Initial Boot
+  checkEngineStatus();
   loadTickerData(activeTicker);
   loadStudyTree();
   fetchReviewedEntities();

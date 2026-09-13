@@ -4,6 +4,12 @@ ENV/
 .git/
 .github/
 .agents/
+api/
+core/
+study/
+research/
+requirements.txt
+pyproject.toml
 others/
 session_logs/
 scratch/

@@ -2,7 +2,7 @@
 
 > **Review Category**: Sovereign Monetary Wealth & Inflation Hedge  
 > **Initial Review Date**: 14-09-2026  
-> **Last Telemetry Update**: 14-09-2026T01:45:53 IST
+> **Last Telemetry Update**: 14-09-2026T03:09:23 IST
 > **Review Cadence**: Daily Market Close (15:30 IST)  
 > **Overall Strategic Verdict**: **ACCUMULATE (Tranche 1 Active)** — Score: **9.0 / 10**
 

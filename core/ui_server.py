@@ -670,15 +670,25 @@ async def index_page(request):
 routes = [
     Route("/", index_page),
     Route("/api/quote", api_quote),
+    Route("/quote", api_quote),
     Route("/api/indicators", api_indicators),
+    Route("/indicators", api_indicators),
     Route("/api/candles", api_candles),
+    Route("/candles", api_candles),
     Route("/api/financials", api_financials),
+    Route("/financials", api_financials),
     Route("/api/duckdb", api_duckdb, methods=["POST"]),
+    Route("/duckdb", api_duckdb, methods=["POST"]),
     Route("/api/batch_quotes", api_batch_quotes),
+    Route("/batch_quotes", api_batch_quotes),
     Route("/api/reviewed_entities", api_reviewed_entities),
+    Route("/reviewed_entities", api_reviewed_entities),
     Route("/api/study/tree", api_study_tree),
+    Route("/study/tree", api_study_tree),
     Route("/api/study/content", api_study_content),
+    Route("/study/content", api_study_content),
     Route("/api/chat", api_chat, methods=["POST"]),
+    Route("/chat", api_chat, methods=["POST"]),
 ]
 
 # Only mount StaticFiles if directory exists on filesystem (prevents crash in serverless)

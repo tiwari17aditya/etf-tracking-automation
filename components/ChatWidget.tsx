@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Minimize2,
   Maximize2,
+  Zap,
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -19,6 +20,12 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  tokens?: {
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    latencyMs: number;
+  };
 }
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -88,6 +95,7 @@ export function ChatWidget() {
         role: 'assistant',
         content: data.content || 'Data verified. Ready for next query.',
         timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        tokens: data.tokens || undefined,
       };
 
       setMessages((prev) => [...prev, botMessage]);
@@ -203,13 +211,19 @@ export function ChatWidget() {
                     <div className="whitespace-pre-wrap font-sans">
                       {msg.content}
                     </div>
-                    <span
-                      className={`text-[9px] block mt-1 ${
-                        isBot ? 'text-slate-500' : 'text-slate-900/70'
-                      }`}
-                    >
-                      {msg.timestamp}
-                    </span>
+                    <div className="flex items-center justify-between mt-1 pt-1 border-t border-slate-800/40 text-[9px]">
+                      <span className={isBot ? 'text-slate-500' : 'text-slate-900/70'}>
+                        {msg.timestamp}
+                      </span>
+                      {isBot && msg.tokens && (
+                        <span className="font-mono text-amber-400/90 font-semibold flex items-center gap-1">
+                          <Zap className="w-2.5 h-2.5 text-amber-400" />
+                          <span>
+                            {msg.tokens.totalTokens} tokens ({msg.tokens.inputTokens} in, {msg.tokens.outputTokens} out) • {msg.tokens.latencyMs}ms
+                          </span>
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {!isBot && (

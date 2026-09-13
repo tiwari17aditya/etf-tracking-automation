@@ -71,3 +71,28 @@ export interface MarketQuote {
     rsi: number;
   }>;
 }
+
+export type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'SUCCESS';
+export type LogCategory = 'QUANT' | 'CRON' | 'HITL' | 'CHAT' | 'SYSTEM' | 'DEPLOY';
+
+export interface AppLog {
+  id: string;
+  timestamp: string;
+  level: LogLevel;
+  category: LogCategory;
+  message: string;
+  details?: string | null;
+  latencyMs?: number | null;
+}
+
+export interface ChatSessionLog {
+  id: string;
+  timestamp: string;
+  userMessage: string;
+  assistantReply: string;
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  latencyMs: number;
+  model: string;
+}

@@ -52,6 +52,8 @@ export async function GET(request: NextRequest) {
     const signals = db.getSignals();
     const pendingSignals = db.getPendingSignals();
     const logs = db.getCronLogs(15);
+    const appLogs = db.getAppLogs(30);
+    const chatLogs = db.getChatSessionLogs(20);
     const settings = db.getSettings();
     const market = getMarketHoursInfo();
 
@@ -63,6 +65,8 @@ export async function GET(request: NextRequest) {
       signals,
       pendingSignals,
       cronLogs: logs,
+      appLogs,
+      chatLogs,
       settings,
       telemetry: {
         accuracyMandate: '>99.2% Mathematical Precision',
@@ -83,6 +87,8 @@ export async function GET(request: NextRequest) {
         pendingSignals: db.getPendingSignals(),
         settings: db.getSettings(),
         cronLogs: db.getCronLogs(5),
+        appLogs: db.getAppLogs(10),
+        chatLogs: db.getChatSessionLogs(5),
       },
       { status: 200 }
     );

@@ -14,11 +14,25 @@ Your mandate:
 5. Be concise, professional, data-first, and precise with currency formatting (₹).
 `;
 
+function estimateTokens(text: string): number {
+  if (!text) return 0;
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const chars = text.length;
+  return Math.max(1, Math.round((chars / 4 + words) / 2));
+}
+
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
   try {
-    const { messages } = await request.json();
+    const { messages = [] } = await request.json();
     const lastUserMessage = messages?.[messages.length - 1]?.content || '';
     const lower = lastUserMessage.toLowerCase();
+
+    // Calculate prompt tokens
+    const inputTokens = messages.reduce(
+      (acc: number, m: any) => acc + estimateTokens(m.content || ''),
+      0
+    );
 
     // Check if Google Generative AI is configured
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -122,17 +136,64 @@ export async function POST(request: NextRequest) {
         `• *"Show portfolio sweep-in balance"*`;
     }
 
+    const outputTokens = estimateTokens(reply);
+    const totalTokens = inputTokens + outputTokens;
+    const latencyMs = Date.now() - startTime;
+    const modelName = 'Gemini-1.5-Flash / Quant-Tool-RAG';
+
+    // Persist session log
+    db.createChatSessionLog({
+      userMessage: lastUserMessage,
+      assistantReply: reply,
+      inputTokens,
+      outputTokens,
+      totalTokens,
+      latencyMs,
+      model: modelName,
+    });
+
+    // Persist application event log
+    db.createAppLog({
+      level: 'INFO',
+      category: 'CHAT',
+      message: `Chat interaction: ${totalTokens} tokens (${inputTokens} in, ${outputTokens} out)`,
+      details: `Prompt preview: "${lastUserMessage.slice(0, 60)}..."`,
+      latencyMs,
+    });
+
     return NextResponse.json({
       role: 'assistant',
       content: reply,
       timestamp: new Date().toISOString(),
+      tokens: {
+        inputTokens,
+        outputTokens,
+        totalTokens,
+        latencyMs,
+      },
     });
   } catch (error: any) {
     console.error('Chat endpoint error:', error);
+    const latencyMs = Date.now() - startTime;
+
+    db.createAppLog({
+      level: 'ERROR',
+      category: 'CHAT',
+      message: 'Chat endpoint exception captured',
+      details: error.message || String(error),
+      latencyMs,
+    });
+
     return NextResponse.json(
       {
         role: 'assistant',
         content: 'I encountered an unexpected error processing your request. All portfolio guards remain active.',
+        tokens: {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          latencyMs,
+        },
       },
       { status: 500 }
     );

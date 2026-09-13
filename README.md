@@ -95,3 +95,33 @@ git push -u origin main
 1. **Layer 1 (Ingestion)**: Exponential retries with `tenacity` against NSE/Yahoo Finance throttling; exits cleanly with `204` or `502` to prevent database corruption.
 2. **Layer 2 (Frontend UI)**: React Error Boundary ([`app/error.tsx`](./app/error.tsx)) with cached fallback feed ensuring zero blank white screens.
 3. **Layer 3 (Chatbot Guardrails)**: Deterministic RAG tool-calling with zero price hallucination and verified hardcoded fallback prompts.
+
+---
+
+## 📊 Formatted Tabular Logs & Session Analytics
+
+The web dashboard features a dedicated **Telemetry Logs & Chat Token Analytics** panel with two formatted tabular views:
+- **Application Event Logs**: Chronological table of system events, quant calculations, cron triggers, and HITL state transitions with severity badges (`SUCCESS`, `INFO`, `WARN`, `ERROR`), category tags, diagnostic details, and response latency.
+- **Chat Session & Token Tracker**: Real-time KPI cards and table tracking **Input (Prompt) Tokens**, **Output (Completion) Tokens**, **Total Tokens**, and execution latency (ms) for every AI co-pilot interaction.
+
+---
+
+## 🧹 Vercel-Only Automated Purge Schedule
+
+To prevent serverless storage bloat while avoiding noisy GitHub Action cron runners, log purging is scheduled **exclusively on Vercel**:
+- **Endpoint**: [`/api/purge`](./app/api/purge/route.ts)
+- **Vercel Schedule**: `0 18 * * 0` (Every Sunday at 18:00 UTC / 11:30 PM IST before the trading week begins).
+- **Retention**: Cleans application logs, cron telemetry, and chat sessions older than 14 days, and auto-expires stale pending dip signals older than 7 days.
+- **Security**: Protected by the same `CRON_SECRET` bearer authorization gate.
+
+---
+
+## ⚡ Custom Skills & `/packup` Routine
+
+This repository includes project-specialized skills under [`.agents/skills/`](./.agents/skills/):
+- **`smart-dip-quant`**: Quantitative mathematical calculations, Wilder's RSI, and 50-EMA procedures.
+- **`smart-dip-hitl-workflow`**: Human-In-The-Loop order execution, approval links, and audit trail rules.
+- **`vercel-serverless-deploy`**: Vercel Serverless continuous deployment runbooks.
+- **`smart-dip-orchestrator`**: Master skill that coordinates all sub-skills and slash commands.
+- **`packup`**: Automated session packup routine that validates builds, updates documentation, stages and pushes changes to GitHub, and concludes with an inspiring motivational proverb.
+

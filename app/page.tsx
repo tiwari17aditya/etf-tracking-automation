@@ -6,8 +6,9 @@ import { AssetCard } from '@/components/AssetCard';
 import { HitlActionCenter } from '@/components/HitlActionCenter';
 import { SignalsTable } from '@/components/SignalsTable';
 import { CronTelemetry } from '@/components/CronTelemetry';
+import { TabularLogs } from '@/components/TabularLogs';
 import { ChatWidget } from '@/components/ChatWidget';
-import { Signal, MarketQuote, CronRunLog, PortfolioSetting } from '@/lib/db/types';
+import { Signal, MarketQuote, CronRunLog, PortfolioSetting, AppLog, ChatSessionLog } from '@/lib/db/types';
 import { AlertCircle, CheckCircle2, ShieldAlert, Sparkles, RefreshCw } from 'lucide-react';
 
 interface DashboardState {
@@ -22,6 +23,8 @@ interface DashboardState {
   signals: Signal[];
   pendingSignals: Signal[];
   cronLogs: CronRunLog[];
+  appLogs: AppLog[];
+  chatLogs: ChatSessionLog[];
   settings: PortfolioSetting;
   engine: string;
   telemetry: {
@@ -266,6 +269,9 @@ export default function Dashboard() {
 
         {/* Signal Audit Ledger & Quant Records */}
         <SignalsTable signals={data.signals || []} />
+
+        {/* Tabular Form Telemetry Logs & Token Usage Analytics */}
+        <TabularLogs appLogs={data.appLogs || []} chatLogs={data.chatLogs || []} />
 
         {/* Serverless Telemetry & 3-Layer Health Status */}
         <CronTelemetry logs={data.cronLogs || []} engine={data.engine} />

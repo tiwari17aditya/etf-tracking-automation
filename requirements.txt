@@ -4,4 +4,4 @@ numpy>=1.26.0
 tenacity>=8.2.0
 requests>=2.31.0
 starlette>=0.37.0
-duckdb>=1.0.0
+mangum>=0.17.0

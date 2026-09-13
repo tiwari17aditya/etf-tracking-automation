@@ -1,6 +1,6 @@
 """
 Vercel Serverless Entry Point for Stock & Quant Research Station.
-Exposes Starlette ASGI app to the Vercel Python Runtime with self-diagnosing error capture.
+Exposes Starlette ASGI app and Mangum handler to the Vercel Python Runtime.
 """
 
 import sys
@@ -13,8 +13,13 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 try:
-    from core.ui_server import app as real_app
-    app = real_app
+    from core.ui_server import app as starlette_app
+    app = starlette_app
+    try:
+        from mangum import Mangum
+        handler = Mangum(app, lifespan="off")
+    except Exception:
+        handler = app
 except Exception as e:
     tb = traceback.format_exc()
     from starlette.applications import Starlette
@@ -29,6 +34,9 @@ except Exception as e:
             "traceback": tb
         }, status_code=200)
 
-    app = Starlette(routes=[
-        Route("/{rest:path}", crash_handler)
-    ])
+    app = Starlette(routes=[Route("/{rest:path}", crash_handler)])
+    try:
+        from mangum import Mangum
+        handler = Mangum(app, lifespan="off")
+    except Exception:
+        handler = app

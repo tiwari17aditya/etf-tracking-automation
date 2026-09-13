@@ -1,42 +1,18 @@
 """
 Vercel Serverless Entry Point for Stock & Quant Research Station.
-Exposes Starlette ASGI app and Mangum handler to the Vercel Python Runtime.
+Exposes Starlette ASGI app directly to the Vercel Python Runtime.
 """
 
 import sys
 import pathlib
-import traceback
 
 # Add project root to sys.path
 ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-try:
-    from core.ui_server import app as starlette_app
-    app = starlette_app
-    try:
-        from mangum import Mangum
-        handler = Mangum(app, lifespan="off")
-    except Exception:
-        handler = app
-except Exception as e:
-    tb = traceback.format_exc()
-    from starlette.applications import Starlette
-    from starlette.responses import JSONResponse
-    from starlette.routing import Route
+from core.ui_server import app
 
-    async def crash_handler(request):
-        return JSONResponse({
-            "error": True,
-            "type": "VercelStartupException",
-            "exception": str(e),
-            "traceback": tb
-        }, status_code=200)
-
-    app = Starlette(routes=[Route("/{rest:path}", crash_handler)])
-    try:
-        from mangum import Mangum
-        handler = Mangum(app, lifespan="off")
-    except Exception:
-        handler = app
+# Explicit top-level exports recognized by Vercel static AST parser
+application = app
+handler = app

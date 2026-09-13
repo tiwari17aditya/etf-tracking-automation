@@ -711,6 +711,10 @@ exception_handlers = {
     Exception: server_error_handler
 }
 
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+]
+
 app = Starlette(routes=routes, middleware=middleware, exception_handlers=exception_handlers)
 
 
